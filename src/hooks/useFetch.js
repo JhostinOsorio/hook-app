@@ -1,8 +1,17 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const useFetch = ( url ) => {
 
+  const isMounted = useRef(true);
   const [state, setstate] = useState({ data: null, loading: true, error: null});
+
+  useEffect(() => {
+
+    return () => {
+      isMounted.current = false
+    }
+
+  }, [])
 
   useEffect(() => {
 
@@ -15,11 +24,13 @@ const useFetch = ( url ) => {
     fetch(url)
       .then(res => res.json())
       .then(data => {
-        setstate({
-          error: null,
-          loading: false,
-          data: data,
-        })
+        if (isMounted.current) {
+          setstate({
+            error: null,
+            loading: false,
+            data: data,
+          })
+        }
       })
   }, [url])
 
