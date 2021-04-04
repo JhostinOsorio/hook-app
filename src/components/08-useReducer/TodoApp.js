@@ -1,32 +1,45 @@
-import React, { useReducer, useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
+import TodoAdd from './TodoAdd';
+import TodoList from './TodoList';
 import todoReducer from './todoReducer';
 
-const initialState = [
-  {
-    id: new Date().getTime(),
-    todo: 'Aprender React',
-    done: false,
-  }
-]
+const init = () => {
+  return JSON.parse(localStorage.getItem('todos')) || []
+}
 
 const TodoApp = () => {
 
-  const [ todos, dispatch ] = useReducer(todoReducer, initialState);
-  const [newTodo, setNewTodo] = useState('')
+  const [ todos, dispatch ] = useReducer(todoReducer, [], init);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const todo = {
-      id: new Date().getTime(),
-      todo: newTodo,
-      done: false
-    }
-    const action = {
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }, [todos])
+
+  const handleAddTodo = ( newTodo ) => {
+    dispatch({
       type: 'add',
-      payload: todo,
+      payload: {
+        id: new Date().getTime(),
+        desc: newTodo,
+        done: false,
+      }
+    })
+  }
+  
+  const handleDelete = ( id ) => {
+    const action = {
+      type: 'delete',
+      payload: id,
     }
     dispatch(action)
-    setNewTodo('')
+  }
+
+  const handleChangeDone = ( id ) => {
+    const action = {
+      type: 'changeDone',
+      payload: id,
+    }
+    dispatch(action)
   }
 
   return (
@@ -36,43 +49,16 @@ const TodoApp = () => {
 
       <div className="row">
         <div className="col-7">
-          <ul className="list-group list-group-flush">
-            {todos.map(({id, todo}, index) => (
-              <li
-                className="list-group-item d-flex align-items-center justify-content-between" 
-                key={id}
-              >
-                <p role="button" className="text-center m-0">{index + 1}. {todo}</p>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                >
-                  Borrar
-                </button>
-              </li>
-            ))}
-          </ul>
+          <TodoList 
+            todos={todos}
+            handleDelete={handleDelete}
+            handleChangeDone={handleChangeDone}
+          />
         </div>
         <div className="col-5">
-          <h4>Agregar TODO</h4>
-          <hr />
-          <form onSubmit={handleSubmit}>
-              <input 
-                type="text"
-                className="form-control"
-                name="description"
-                placeholder="Aprender ..."
-                autoComplete="off"
-                value={newTodo}
-                onChange={(e)=>setNewTodo(e.target.value)}
-              />
-              <button
-                type="submit"
-                className="mt-2 btn btn-block btn-outline-primary"
-              >
-                Agregar
-              </button>
-          </form>
+          <TodoAdd 
+            handleAddTodo={handleAddTodo}
+          />
         </div>
       </div>
     </div>
