@@ -32,6 +32,13 @@ const useFetch = ( url ) => {
           })
         }
       })
+      .catch(error => {
+        setstate({
+          data: null,
+          loading:false,
+          error: 'No se pudo cargar la info',
+        })
+      })
   }, [url])
 
   return state;
