@@ -18,7 +18,23 @@ describe('Pruebas en <MultipleCustomHooks />', () => {
   })
 
   test('debe de mostrar la informacion', () => {
-    useFetch()
+    useFetch.mockReturnValue({
+      data: [
+        {
+          author: 'Jhostin',
+          quote: 'Hola mundo',
+        }
+      ],
+      loading: false,
+      error: null,
+    })
+
+    const wrapper = shallow(<MultipleCustomHook />)
+    expect(wrapper.find('.alert').exists()).toBe(false);
+    expect(wrapper.find('blockquote.blockquote > p').text()).toBe('Hola mundo');
+    expect(wrapper.find('footer.blockquote-footer').text()).toBe('Jhostin');
+
+    // console.log(wrapper.html())
   })
 
 })
